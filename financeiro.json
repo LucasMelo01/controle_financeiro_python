@@ -1,0 +1,17 @@
+{
+    "saldo": 1000.0,
+    "transacoes": [
+        {
+            "tipo": "entrada",
+            "valor": 1200.0,
+            "descricao": "salario",
+            "data": "24/09/2025 14:05"
+        },
+        {
+            "tipo": "saida",
+            "valor": 200.0,
+            "descricao": "roupas",
+            "data": "24/09/2025 14:05"
+        }
+    ]
+}
