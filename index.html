@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinTrack — Controle Financeiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0e1117;
+      --bg2:      #161b24;
+      --bg3:      #1e2535;
+      --border:   #2a3040;
+      --text:     #e2e8f0;
+      --text2:    #8b95a8;
+      --text3:    #4a5568;
+      --green:    #22d37a;
+      --green-bg: rgba(34,211,122,.10);
+      --red:      #f06b6b;
+      --red-bg:   rgba(240,107,107,.10);
+      --radius:   10px;
+      --mono:     'DM Mono', monospace;
+      --font:     'DM Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .logo     { font-size: 18px; font-weight: 600; }
+    .logo-sub { font-size: 13px; color: var(--text3); }
+
+    /* ── Banner de erro de conexão ── */
+    #banner-erro {
+      display: none;
+      background: rgba(240,107,107,.1);
+      border-bottom: 1px solid rgba(240,107,107,.3);
+      color: var(--red);
+      font-size: 13px;
+      padding: 10px 32px;
+      text-align: center;
+    }
+    #banner-erro code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: rgba(0,0,0,.25);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* ── Layout ── */
+    main {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      padding: 28px 32px;
+      align-items: start;
+    }
+    .col-left, .col-right { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .card-count { font-size: 12px; font-weight: 400; color: var(--text3); }
+
+    /* ── Resumo ── */
+    .resumo-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+    .resumo-saldo { font-size: 30px; font-weight: 600; font-family: var(--mono); margin: 4px 0 14px; }
+    .resumo-linha { height: 1px; background: var(--border); margin-bottom: 14px; }
+    .resumo-row   { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .resumo-num   { font-size: 15px; font-weight: 600; font-family: var(--mono); }
+    .verde    { color: var(--green); }
+    .vermelho { color: var(--red); }
+
+    /* ── Toggle tipo ── */
+    .tipo-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .tipo-btn {
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text2);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: all .15s;
+    }
+    .tipo-btn:hover { background: var(--bg3); }
+    .tipo-btn.entrada-ativo { background: var(--green-bg); color: var(--green); }
+    .tipo-btn.saida-ativo   { background: var(--red-bg);   color: var(--red);   }
+
+    /* ── Formulário ── */
+    .form { display: flex; flex-direction: column; gap: 12px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 12px; font-weight: 500; color: var(--text2); }
+    .field input {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      font-family: var(--font);
+      transition: border-color .15s;
+    }
+    .field input:focus { border-color: var(--green); }
+    .field input::placeholder { color: var(--text3); }
+
+    .msg-erro { font-size: 13px; color: var(--red); }
+
+    .btn-salvar {
+      padding: 11px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      font-family: var(--font);
+      transition: opacity .15s;
+    }
+    .btn-salvar:hover:not(:disabled) { opacity: .85; }
+    .btn-salvar:disabled { opacity: .5; cursor: not-allowed; }
+    .btn-entrada { background: var(--green); color: #000; }
+    .btn-saida   { background: var(--red);   color: #fff; }
+
+    /* ── Lista ── */
+    .lista-vazia    { font-size: 14px; color: var(--text3); text-align: center; padding: 24px 0; }
+    .lista-carregando { font-size: 14px; color: var(--text3); text-align: center; padding: 24px 0; }
+    #lista { display: flex; flex-direction: column; gap: 2px; list-style: none; }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 8px;
+      border-radius: 8px;
+      transition: background .15s;
+    }
+    .item:hover { background: var(--bg3); }
+    .item:hover .btn-del { opacity: 1; }
+
+    .item-icone {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .icone-entrada { background: var(--green-bg); color: var(--green); }
+    .icone-saida   { background: var(--red-bg);   color: var(--red);   }
+
+    .item-info  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .item-desc  { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-data  { font-size: 11px; color: var(--text3); }
+    .item-valor { font-size: 14px; font-weight: 600; font-family: var(--mono); flex-shrink: 0; }
+
+    .btn-del {
+      background: none; border: none;
+      color: var(--text3); font-size: 20px;
+      cursor: pointer; padding: 2px 6px;
+      border-radius: 6px; line-height: 1;
+      opacity: 0; transition: opacity .15s, color .15s;
+    }
+    .btn-del:hover { color: var(--red); }
+
+    /* ── Responsivo ── */
+    @media (max-width: 700px) {
+      main   { grid-template-columns: 1fr; padding: 16px; }
+      header { padding: 14px 16px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <span class="logo">💰 FinTrack</span>
+  <span class="logo-sub">Controle financeiro pessoal</span>
+</header>
+
+<div id="banner-erro">
+  ⚠️ Backend não encontrado. No terminal, rode: <code>uvicorn main:app --reload</code>
+</div>
+
+<main>
+  <!-- Coluna esquerda -->
+  <div class="col-left">
+
+    <!-- Resumo -->
+    <div class="card">
+      <div class="resumo-label">Saldo atual</div>
+      <div class="resumo-saldo verde" id="saldo">R$ 0,00</div>
+      <div class="resumo-linha"></div>
+      <div class="resumo-row">
+        <span class="resumo-label">↑ Entradas</span>
+        <span class="resumo-num verde" id="total-entradas">R$ 0,00</span>
+      </div>
+      <div class="resumo-row">
+        <span class="resumo-label">↓ Saídas</span>
+        <span class="resumo-num vermelho" id="total-saidas">R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="card">
+      <div class="card-title">Nova transação</div>
+
+      <div class="tipo-toggle">
+        <button class="tipo-btn saida-ativo" id="btn-saida"   onclick="setTipo('saida')">↓ Saída</button>
+        <button class="tipo-btn"             id="btn-entrada" onclick="setTipo('entrada')">↑ Entrada</button>
+      </div>
+
+      <div class="form">
+        <div class="field">
+          <label for="valor">Valor (R$)</label>
+          <input type="number" id="valor" step="0.01" min="0.01" placeholder="0,00" />
+        </div>
+        <div class="field">
+          <label for="descricao">Descrição</label>
+          <input type="text" id="descricao" placeholder="Ex: Salário, Aluguel, Mercado..." />
+        </div>
+        <p class="msg-erro" id="erro" style="display:none"></p>
+        <button class="btn-salvar btn-saida" id="btn-salvar" onclick="salvar()">Adicionar saída</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Coluna direita -->
+  <div class="col-right">
+    <div class="card">
+      <div class="card-title">
+        Últimas transações
+        <span class="card-count" id="contagem"></span>
+      </div>
+      <ul id="lista">
+        <li class="lista-carregando">Carregando...</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+  const API = 'http://localhost:8000'
+  let tipoAtual = 'saida'
+
+  // Utilitários ────
+  function moeda(v) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
+  }
+
+  // Toggle entrada / saída ───
+  function setTipo(tipo) {
+    tipoAtual = tipo
+    document.getElementById('btn-entrada').className = 'tipo-btn' + (tipo === 'entrada' ? ' entrada-ativo' : '')
+    document.getElementById('btn-saida').className   = 'tipo-btn' + (tipo === 'saida'   ? ' saida-ativo'   : '')
+    const btn = document.getElementById('btn-salvar')
+    btn.textContent = `Adicionar ${tipo}`
+    btn.className   = `btn-salvar btn-${tipo}`
+  }
+
+  // Buscar dados do backend ───
+  async function carregar() {
+    try {
+      const res  = await fetch(`${API}/transacoes`)
+      const data = await res.json()
+
+      document.getElementById('banner-erro').style.display = 'none'
+      renderizarResumo(data.saldo, data.total_entradas, data.total_saidas)
+      renderizarLista(data.transacoes)
+    } catch {
+      document.getElementById('banner-erro').style.display = 'block'
+      document.getElementById('lista').innerHTML =
+        '<li class="lista-vazia">Não foi possível conectar ao backend.</li>'
+    }
+  }
+
+  // Adicionar transação ───
+  async function salvar() {
+    const valor     = parseFloat(document.getElementById('valor').value)
+    const descricao = document.getElementById('descricao').value.trim()
+    const erro      = document.getElementById('erro')
+
+    if (!valor || valor <= 0) {
+      erro.textContent = 'Informe um valor válido.'
+      erro.style.display = 'block'
+      return
+    }
+    if (!descricao) {
+      erro.textContent = 'Informe uma descrição.'
+      erro.style.display = 'block'
+      return
+    }
+    erro.style.display = 'none'
+
+    const btn = document.getElementById('btn-salvar')
+    btn.disabled = true
+    btn.textContent = 'Salvando...'
+
+    try {
+      await fetch(`${API}/transacoes`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ tipo: tipoAtual, valor, descricao }),
+      })
+
+      document.getElementById('valor').value     = ''
+      document.getElementById('descricao').value = ''
+      await carregar()
+    } catch {
+      erro.textContent   = 'Erro ao salvar. Backend está rodando?'
+      erro.style.display = 'block'
+    } finally {
+      btn.disabled    = false
+      btn.textContent = `Adicionar ${tipoAtual}`
+    }
+  }
+
+  // Deletar transação ────
+  async function deletar(id) {
+    if (!confirm('Remover esta transação?')) return
+    await fetch(`${API}/transacoes/${id}`, { method: 'DELETE' })
+    await carregar()
+  }
+
+  // Renderizar resumo ────
+  function renderizarResumo(saldo, entradas, saidas) {
+    const el = document.getElementById('saldo')
+    el.textContent = moeda(saldo)
+    el.className   = 'resumo-saldo ' + (saldo >= 0 ? 'verde' : 'vermelho')
+    document.getElementById('total-entradas').textContent = moeda(entradas)
+    document.getElementById('total-saidas').textContent   = moeda(saidas)
+  }
+
+  // Renderizar lista ───
+  function renderizarLista(transacoes) {
+    const lista = document.getElementById('lista')
+    document.getElementById('contagem').textContent = transacoes.length
+      ? `${transacoes.length} registro${transacoes.length > 1 ? 's' : ''}`
+      : ''
+
+    if (transacoes.length === 0) {
+      lista.innerHTML = '<li class="lista-vazia">Nenhuma transação registrada ainda.</li>'
+      return
+    }
+
+    lista.innerHTML = transacoes.map(tx => `
+      <li class="item">
+        <div class="item-icone ${tx.tipo === 'entrada' ? 'icone-entrada' : 'icone-saida'}">
+          ${tx.tipo === 'entrada' ? '↑' : '↓'}
+        </div>
+        <div class="item-info">
+          <span class="item-desc">${tx.descricao}</span>
+          <span class="item-data">${tx.data}</span>
+        </div>
+        <span class="item-valor ${tx.tipo === 'entrada' ? 'verde' : 'vermelho'}">
+          ${tx.tipo === 'entrada' ? '+' : '-'}${moeda(tx.valor)}
+        </span>
+        <button class="btn-del" onclick="deletar(${tx.id})" title="Remover">×</button>
+      </li>
+    `).join('')
+  }
+
+  // Enter no campo descrição salva
+  document.getElementById('descricao').addEventListener('keydown', e => {
+    if (e.key === 'Enter') salvar()
+  })
+
+  // Inicializar
+  carregar()
+</script>
+
+</body>
+</html>
