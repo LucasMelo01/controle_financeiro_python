@@ -3,28 +3,36 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FinTrack — Controle Financeiro</title>
+  <title>Finance — Controle Financeiro</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #0e1117;
-      --bg2:      #161b24;
-      --bg3:      #1e2535;
-      --border:   #2a3040;
-      --text:     #e2e8f0;
-      --text2:    #8b95a8;
-      --text3:    #4a5568;
-      --green:    #22d37a;
-      --green-bg: rgba(34,211,122,.10);
-      --red:      #f06b6b;
-      --red-bg:   rgba(240,107,107,.10);
-      --radius:   10px;
-      --mono:     'DM Mono', monospace;
-      --font:     'DM Sans', sans-serif;
+      --bg:        #f8f9fc;
+      --bg2:       #ffffff;
+      --bg3:       #f1f4f9;
+      --border:    #e4e9f0;
+      --border2:   #d0d7e3;
+      --text:      #111827;
+      --text2:     #4b5563;
+      --text3:     #9ca3af;
+      --blue:      #2563eb;
+      --blue-light:#eff4ff;
+      --blue-mid:  #dbeafe;
+      --blue-dark: #1d4ed8;
+      --green:     #059669;
+      --green-bg:  #ecfdf5;
+      --red:       #dc2626;
+      --red-bg:    #fef2f2;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+      --shadow:    0 4px 12px rgba(0,0,0,.07), 0 1px 3px rgba(0,0,0,.04);
+      --radius:    10px;
+      --radius-lg: 14px;
+      --mono:      'DM Mono', monospace;
+      --font:      'Inter', sans-serif;
     }
 
     body {
@@ -40,19 +48,71 @@
     header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px 32px;
-      border-bottom: 1px solid var(--border);
+      justify-content: space-between;
+      padding: 14px 32px;
       background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+      box-shadow: var(--shadow-sm);
     }
-    .logo     { font-size: 18px; font-weight: 600; }
-    .logo-sub { font-size: 13px; color: var(--text3); }
+    .header-left  { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--blue);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .logo      { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -.3px; }
+    .logo span { color: var(--blue); }
+    .logo-sub  { font-size: 12px; color: var(--text3); }
 
-    /* ── Banner de erro de conexão ── */
+    /* ── Navegação de mês ── */
+    .mes-nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 5px 8px;
+    }
+    .mes-btn {
+      background: none;
+      border: none;
+      border-radius: 6px;
+      color: var(--text2);
+      cursor: pointer;
+      font-size: 16px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+      line-height: 1;
+    }
+    .mes-btn:hover:not(:disabled) { background: var(--border); color: var(--text); }
+    .mes-btn:disabled { opacity: .3; cursor: not-allowed; }
+    .mes-info { display: flex; flex-direction: column; align-items: center; min-width: 130px; }
+    .mes-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .mes-atual-badge {
+      font-size: 10px;
+      background: var(--blue-light);
+      color: var(--blue);
+      border-radius: 20px;
+      padding: 1px 7px;
+      font-weight: 500;
+      margin-top: 1px;
+    }
+
+    /* ── Banner erro ── */
     #banner-erro {
       display: none;
-      background: rgba(240,107,107,.1);
-      border-bottom: 1px solid rgba(240,107,107,.3);
+      background: #fff5f5;
+      border-bottom: 1px solid #fecaca;
       color: var(--red);
       font-size: 13px;
       padding: 10px 32px;
@@ -61,7 +121,7 @@
     #banner-erro code {
       font-family: var(--mono);
       font-size: 12px;
-      background: rgba(0,0,0,.25);
+      background: rgba(0,0,0,.06);
       padding: 2px 7px;
       border-radius: 4px;
     }
@@ -70,9 +130,11 @@
     main {
       display: grid;
       grid-template-columns: 340px 1fr;
-      gap: 24px;
-      padding: 28px 32px;
+      gap: 20px;
+      padding: 24px 32px;
       align-items: start;
+      max-width: 1100px;
+      margin: 0 auto;
     }
     .col-left, .col-right { display: flex; flex-direction: column; gap: 16px; }
 
@@ -80,54 +142,105 @@
     .card {
       background: var(--bg2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius-lg);
       padding: 20px;
+      box-shadow: var(--shadow-sm);
     }
     .card-title {
       font-size: 14px;
       font-weight: 600;
+      color: var(--text);
       margin-bottom: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
-    .card-count { font-size: 12px; font-weight: 400; color: var(--text3); }
+    .card-count {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text3);
+      background: var(--bg3);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
 
     /* ── Resumo ── */
-    .resumo-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
-    .resumo-saldo { font-size: 30px; font-weight: 600; font-family: var(--mono); margin: 4px 0 14px; }
+    .resumo-periodo {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    .resumo-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; font-weight: 500; }
+    .resumo-saldo { font-size: 32px; font-weight: 700; font-family: var(--mono); margin: 4px 0 16px; letter-spacing: -.5px; }
     .resumo-linha { height: 1px; background: var(--border); margin-bottom: 14px; }
-    .resumo-row   { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .resumo-row   { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .resumo-num   { font-size: 15px; font-weight: 600; font-family: var(--mono); }
+
+    .resumo-pill {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .pill-entrada { background: var(--green-bg); color: var(--green); }
+    .pill-saida   { background: var(--red-bg);   color: var(--red);   }
+
     .verde    { color: var(--green); }
-    .vermelho { color: var(--red); }
+    .vermelho { color: var(--red);   }
+    .azul     { color: var(--blue);  }
 
     /* ── Toggle tipo ── */
     .tipo-toggle {
       display: grid;
       grid-template-columns: 1fr 1fr;
+      background: var(--bg3);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
       margin-bottom: 16px;
+      padding: 3px;
+      gap: 3px;
     }
     .tipo-btn {
-      padding: 10px;
+      padding: 9px;
       border: none;
       background: transparent;
       color: var(--text2);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
       cursor: pointer;
       font-family: var(--font);
+      border-radius: 7px;
       transition: all .15s;
     }
-    .tipo-btn:hover { background: var(--bg3); }
-    .tipo-btn.entrada-ativo { background: var(--green-bg); color: var(--green); }
-    .tipo-btn.saida-ativo   { background: var(--red-bg);   color: var(--red);   }
+    .tipo-btn:hover { background: var(--bg2); }
+    .tipo-btn.entrada-ativo {
+      background: var(--bg2);
+      color: var(--green);
+      box-shadow: var(--shadow-sm);
+    }
+    .tipo-btn.saida-ativo {
+      background: var(--bg2);
+      color: var(--red);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ── Aviso mês anterior ── */
+    .aviso-mes {
+      display: none;
+      font-size: 12px;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+    }
 
     /* ── Formulário ── */
-    .form { display: flex; flex-direction: column; gap: 12px; }
+    .form  { display: flex; flex-direction: column; gap: 12px; }
     .field { display: flex; flex-direction: column; gap: 5px; }
     .field label { font-size: 12px; font-weight: 500; color: var(--text2); }
     .field input {
@@ -139,12 +252,16 @@
       color: var(--text);
       outline: none;
       font-family: var(--font);
-      transition: border-color .15s;
+      transition: border-color .15s, box-shadow .15s;
     }
-    .field input:focus { border-color: var(--green); }
+    .field input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+      background: var(--bg2);
+    }
     .field input::placeholder { color: var(--text3); }
 
-    .msg-erro { font-size: 13px; color: var(--red); }
+    .msg-erro { font-size: 12px; color: var(--red); }
 
     .btn-salvar {
       padding: 11px;
@@ -153,59 +270,62 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 4px;
+      margin-top: 2px;
       font-family: var(--font);
-      transition: opacity .15s;
+      transition: all .15s;
+      letter-spacing: -.1px;
     }
-    .btn-salvar:hover:not(:disabled) { opacity: .85; }
-    .btn-salvar:disabled { opacity: .5; cursor: not-allowed; }
-    .btn-entrada { background: var(--green); color: #000; }
-    .btn-saida   { background: var(--red);   color: #fff; }
+    .btn-salvar:hover:not(:disabled) { filter: brightness(1.05); transform: translateY(-1px); box-shadow: var(--shadow); }
+    .btn-salvar:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-entrada { background: var(--green); color: #fff; }
+    .btn-saida   { background: var(--blue);  color: #fff; }
 
     /* ── Lista ── */
-    .lista-vazia    { font-size: 14px; color: var(--text3); text-align: center; padding: 24px 0; }
-    .lista-carregando { font-size: 14px; color: var(--text3); text-align: center; padding: 24px 0; }
-    #lista { display: flex; flex-direction: column; gap: 2px; list-style: none; }
+    .lista-vazia      { font-size: 14px; color: var(--text3); text-align: center; padding: 32px 0; }
+    .lista-carregando { font-size: 14px; color: var(--text3); text-align: center; padding: 32px 0; }
+    #lista { display: flex; flex-direction: column; list-style: none; }
 
     .item {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 10px 8px;
-      border-radius: 8px;
-      transition: background .15s;
+      padding: 11px 10px;
+      border-radius: var(--radius);
+      transition: background .12s;
+      border-bottom: 1px solid var(--border);
     }
+    .item:last-child { border-bottom: none; }
     .item:hover { background: var(--bg3); }
     .item:hover .btn-del { opacity: 1; }
 
     .item-icone {
-      width: 32px; height: 32px;
+      width: 34px; height: 34px;
       border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700;
+      font-size: 14px; font-weight: 700;
       flex-shrink: 0;
     }
     .icone-entrada { background: var(--green-bg); color: var(--green); }
-    .icone-saida   { background: var(--red-bg);   color: var(--red);   }
+    .icone-saida   { background: var(--blue-light); color: var(--blue); }
 
     .item-info  { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .item-desc  { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-desc  { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .item-data  { font-size: 11px; color: var(--text3); }
-    .item-valor { font-size: 14px; font-weight: 600; font-family: var(--mono); flex-shrink: 0; }
+    .item-valor { font-size: 14px; font-weight: 600; font-family: var(--mono); flex-shrink: 0; letter-spacing: -.3px; }
 
     .btn-del {
       background: none; border: none;
-      color: var(--text3); font-size: 20px;
-      cursor: pointer; padding: 2px 6px;
+      color: var(--text3); font-size: 18px;
+      cursor: pointer; padding: 3px 7px;
       border-radius: 6px; line-height: 1;
-      opacity: 0; transition: opacity .15s, color .15s;
+      opacity: 0; transition: opacity .15s, background .15s, color .15s;
     }
-    .btn-del:hover { color: var(--red); }
+    .btn-del:hover { color: var(--red); background: var(--red-bg); }
 
     /* ── Responsivo ── */
     @media (max-width: 700px) {
       main   { grid-template-columns: 1fr; padding: 16px; }
-      header { padding: 14px 16px; }
+      header { padding: 12px 16px; }
     }
   </style>
 </head>
@@ -213,8 +333,22 @@
 <body>
 
 <header>
-  <span class="logo">💰 FinTrack</span>
-  <span class="logo-sub">Controle financeiro pessoal</span>
+  <div class="header-left">
+    <div class="logo-icon">💰</div>
+    <div>
+      <div class="logo">Finance<span>.</span></div>
+      <div class="logo-sub">Controle financeiro pessoal</div>
+    </div>
+  </div>
+
+  <div class="mes-nav">
+    <button class="mes-btn" id="btn-mes-ant" onclick="mudarMes(-1)" title="Mês anterior">&#8249;</button>
+    <div class="mes-info">
+      <span class="mes-label" id="mes-label">Carregando...</span>
+      <span class="mes-atual-badge" id="badge-atual" style="display:none">mês atual</span>
+    </div>
+    <button class="mes-btn" id="btn-mes-prox" onclick="mudarMes(1)" title="Próximo mês">&#8250;</button>
+  </div>
 </header>
 
 <div id="banner-erro">
@@ -222,20 +356,20 @@
 </div>
 
 <main>
-  <!-- Coluna esquerda -->
   <div class="col-left">
 
     <!-- Resumo -->
     <div class="card">
-      <div class="resumo-label">Saldo atual</div>
-      <div class="resumo-saldo verde" id="saldo">R$ 0,00</div>
+      <div class="resumo-periodo" id="resumo-mes-titulo">Resumo do mês</div>
+      <div class="resumo-label">Saldo</div>
+      <div class="resumo-saldo azul" id="saldo">R$ 0,00</div>
       <div class="resumo-linha"></div>
       <div class="resumo-row">
-        <span class="resumo-label">↑ Entradas</span>
+        <span class="resumo-pill pill-entrada">↑ Entradas</span>
         <span class="resumo-num verde" id="total-entradas">R$ 0,00</span>
       </div>
       <div class="resumo-row">
-        <span class="resumo-label">↓ Saídas</span>
+        <span class="resumo-pill pill-saida">↓ Saídas</span>
         <span class="resumo-num vermelho" id="total-saidas">R$ 0,00</span>
       </div>
     </div>
@@ -243,6 +377,10 @@
     <!-- Formulário -->
     <div class="card">
       <div class="card-title">Nova transação</div>
+
+      <div class="aviso-mes" id="aviso-mes">
+        ⚠️ Visualizando mês anterior. Novos lançamentos vão para o mês atual.
+      </div>
 
       <div class="tipo-toggle">
         <button class="tipo-btn saida-ativo" id="btn-saida"   onclick="setTipo('saida')">↓ Saída</button>
@@ -256,7 +394,7 @@
         </div>
         <div class="field">
           <label for="descricao">Descrição</label>
-          <input type="text" id="descricao" placeholder="Ex: Salário, Aluguel, Mercado..." />
+          <input type="text" id="descricao" placeholder="Ex: Salário, Conta de luz, Mercado..." />
         </div>
         <p class="msg-erro" id="erro" style="display:none"></p>
         <button class="btn-salvar btn-saida" id="btn-salvar" onclick="salvar()">Adicionar saída</button>
@@ -265,11 +403,10 @@
 
   </div>
 
-  <!-- Coluna direita -->
   <div class="col-right">
     <div class="card">
       <div class="card-title">
-        Últimas transações
+        Transações do mês
         <span class="card-count" id="contagem"></span>
       </div>
       <ul id="lista">
@@ -281,70 +418,108 @@
 
 <script>
   const API = 'http://localhost:8000'
-  let tipoAtual = 'saida'
+  let tipoAtual   = 'saida'
+  let meses       = []
+  let indiceAtual = 0
+  const mesHoje   = new Date().toISOString().slice(0, 7)
 
-  // Utilitários ────
   function moeda(v) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
   }
 
-  // Toggle entrada / saída ───
+  function nomeMes(anoMes) {
+    const [ano, mes] = anoMes.split('-')
+    return new Date(parseInt(ano), parseInt(mes) - 1, 1)
+      .toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })
+      .replace(/^\w/, c => c.toUpperCase())
+  }
+
+  function mudarMes(direcao) {
+    indiceAtual += direcao
+    atualizarNavegacao()
+    carregar()
+  }
+
+  function atualizarNavegacao() {
+    const mes    = meses[indiceAtual]
+    const ehAtual = mes === mesHoje
+    document.getElementById('mes-label').textContent         = nomeMes(mes)
+    document.getElementById('btn-mes-ant').disabled          = indiceAtual >= meses.length - 1
+    document.getElementById('btn-mes-prox').disabled         = indiceAtual <= 0
+    document.getElementById('resumo-mes-titulo').textContent = nomeMes(mes)
+    document.getElementById('badge-atual').style.display     = ehAtual ? 'block' : 'none'
+    document.getElementById('aviso-mes').style.display       = ehAtual ? 'none'  : 'block'
+  }
+
   function setTipo(tipo) {
     tipoAtual = tipo
     document.getElementById('btn-entrada').className = 'tipo-btn' + (tipo === 'entrada' ? ' entrada-ativo' : '')
     document.getElementById('btn-saida').className   = 'tipo-btn' + (tipo === 'saida'   ? ' saida-ativo'   : '')
     const btn = document.getElementById('btn-salvar')
     btn.textContent = `Adicionar ${tipo}`
-    btn.className   = `btn-salvar btn-${tipo}`
+    btn.className   = `btn-salvar ${tipo === 'entrada' ? 'btn-entrada' : 'btn-saida'}`
   }
 
-  // Buscar dados do backend ───
-  async function carregar() {
+  async function inicializar() {
     try {
-      const res  = await fetch(`${API}/transacoes`)
-      const data = await res.json()
-
+      const res   = await fetch(`${API}/meses`)
+      const data  = await res.json()
+      meses = data.meses
+      if (!meses.includes(mesHoje)) meses.unshift(mesHoje)
+      indiceAtual = 0
+      atualizarNavegacao()
+      await carregar()
       document.getElementById('banner-erro').style.display = 'none'
-      renderizarResumo(data.saldo, data.total_entradas, data.total_saidas)
-      renderizarLista(data.transacoes)
     } catch {
       document.getElementById('banner-erro').style.display = 'block'
+      meses = [mesHoje]
+      document.getElementById('mes-label').textContent = nomeMes(mesHoje)
       document.getElementById('lista').innerHTML =
         '<li class="lista-vazia">Não foi possível conectar ao backend.</li>'
     }
   }
 
-  // Adicionar transação ───
+  async function carregar() {
+    const mes = meses[indiceAtual]
+    try {
+      const res  = await fetch(`${API}/transacoes?mes=${mes}`)
+      const data = await res.json()
+      renderizarResumo(data.saldo, data.total_entradas, data.total_saidas)
+      renderizarLista(data.transacoes)
+      document.getElementById('banner-erro').style.display = 'none'
+    } catch {
+      document.getElementById('banner-erro').style.display = 'block'
+    }
+  }
+
   async function salvar() {
     const valor     = parseFloat(document.getElementById('valor').value)
     const descricao = document.getElementById('descricao').value.trim()
     const erro      = document.getElementById('erro')
 
-    if (!valor || valor <= 0) {
-      erro.textContent = 'Informe um valor válido.'
-      erro.style.display = 'block'
-      return
-    }
-    if (!descricao) {
-      erro.textContent = 'Informe uma descrição.'
-      erro.style.display = 'block'
-      return
-    }
+    if (!valor || valor <= 0) { erro.textContent = 'Informe um valor válido.'; erro.style.display = 'block'; return }
+    if (!descricao)           { erro.textContent = 'Informe uma descrição.';   erro.style.display = 'block'; return }
     erro.style.display = 'none'
 
     const btn = document.getElementById('btn-salvar')
-    btn.disabled = true
+    btn.disabled    = true
     btn.textContent = 'Salvando...'
 
     try {
       await fetch(`${API}/transacoes`, {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ tipo: tipoAtual, valor, descricao }),
+        body: JSON.stringify({ tipo: tipoAtual, valor, descricao }),
       })
-
       document.getElementById('valor').value     = ''
       document.getElementById('descricao').value = ''
+
+      const resMeses  = await fetch(`${API}/meses`)
+      const dataMeses = await resMeses.json()
+      meses = dataMeses.meses
+      if (!meses.includes(mesHoje)) meses.unshift(mesHoje)
+      indiceAtual = 0
+      atualizarNavegacao()
       await carregar()
     } catch {
       erro.textContent   = 'Erro ao salvar. Backend está rodando?'
@@ -355,31 +530,27 @@
     }
   }
 
-  // Deletar transação ────
   async function deletar(id) {
     if (!confirm('Remover esta transação?')) return
     await fetch(`${API}/transacoes/${id}`, { method: 'DELETE' })
     await carregar()
   }
 
-  // Renderizar resumo ────
   function renderizarResumo(saldo, entradas, saidas) {
     const el = document.getElementById('saldo')
     el.textContent = moeda(saldo)
-    el.className   = 'resumo-saldo ' + (saldo >= 0 ? 'verde' : 'vermelho')
+    el.className   = 'resumo-saldo ' + (saldo >= 0 ? 'azul' : 'vermelho')
     document.getElementById('total-entradas').textContent = moeda(entradas)
     document.getElementById('total-saidas').textContent   = moeda(saidas)
   }
 
-  // Renderizar lista ───
   function renderizarLista(transacoes) {
     const lista = document.getElementById('lista')
     document.getElementById('contagem').textContent = transacoes.length
-      ? `${transacoes.length} registro${transacoes.length > 1 ? 's' : ''}`
-      : ''
+      ? `${transacoes.length} registro${transacoes.length > 1 ? 's' : ''}` : ''
 
     if (transacoes.length === 0) {
-      lista.innerHTML = '<li class="lista-vazia">Nenhuma transação registrada ainda.</li>'
+      lista.innerHTML = '<li class="lista-vazia">Nenhuma transação registrada neste mês.</li>'
       return
     }
 
@@ -400,13 +571,11 @@
     `).join('')
   }
 
-  // Enter no campo descrição salva
   document.getElementById('descricao').addEventListener('keydown', e => {
     if (e.key === 'Enter') salvar()
   })
 
-  // Inicializar
-  carregar()
+  inicializar()
 </script>
 
 </body>

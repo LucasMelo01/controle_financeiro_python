@@ -1,14 +1,14 @@
-# 💰 FinTrack v2
+# Finance — Controle Financeiro Pessoal
 
-Controle financeiro pessoal com backend Python e banco de dados.
-Os dados ficam salvos no arquivo `fintrack.db` e não se perdem ao reiniciar.
+Controle financeiro com visão mensal. Registre entradas e saídas,
+navegue entre meses e acompanhe seu saldo mês a mês.
 
 ---
 
 ## Arquivos do projeto
 
 ```
-fintrack-v2/
+finance/
 ├── main.py           ← backend (FastAPI + SQLite)
 ├── requirements.txt  ← dependências Python
 ├── index.html        ← frontend (abre direto no navegador)
@@ -48,19 +48,18 @@ Com o backend rodando, abra o `index.html` direto no navegador.
 
 ---
 
-## O que mudou em relação à versão anterior
+## Funcionalidades
 
-| Antes (só código pyton)    | Agora (HTML + Backend)        |
-|----------------------------|-------------------------------|
-|                            | Dados no banco SQLite         |
-|                            | Persistem para sempre         |
-|                            | FastAPI rodando na porta 8000 |
+- Registrar entradas e saídas com descrição
+- Resumo do mês: saldo, total de entradas e saídas
+- Navegar entre meses com as setas ‹ ›
+- Dados salvos no banco SQLite (não se perdem ao reiniciar)
 
 ---
 
 ## Próximos passos
 
-- [ ] Categorias de gasto
+- [ ] Categorias (Moradia, Mercado,Transporte...)
 - [ ] Filtrar por tipo (entrada/saída)
-- [ ] Dashboard com gráficos
+- [ ] Gráfico de gastos por categoria
 - [ ] Login e múltiplos usuários
